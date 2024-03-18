@@ -1,95 +1,54 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+"use client"
+import { useState, useEffect, memo } from 'react';
+import main from './main.module.scss';
+import Sidebar from './sidebar';
+import CoursesList from './coursesList';
 
-export default function Home() {
+function Home() {
+  const [courses, setCourses] = useState<ICourse[]>([]);
+  const [selectedTag, setSelectedTag] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchCourses = async () => {
+      try {
+        const response = await fetch('https://logiclike.com/docs/courses.json');
+        if (!response.ok) {
+          throw new Error('Failed to fetch courses');
+        }
+        const data = await response.json();
+        return data;
+      } catch (error) {
+        console.error('Error fetching courses:', error);
+        return [];
+      }
+    };
+
+    fetchCourses().then(coursesData => {
+      const courses: ICourse[] = coursesData.map((course: any) => ({
+        name: course.name,
+        id: course.id,
+        image: course.image,
+        bgColor: course.bgColor,
+        tags: course.tags,
+      }));
+      setCourses(courses);
+    }).catch(error => {
+      console.error('Error loading courses:', error);
+    });
+  }, []);
+
+  const handleTagSelect = (tag: string) => {
+    setSelectedTag(tag);
+  };
+
+  const filteredCourses = selectedTag ? courses.filter(course => course.tags.includes(selectedTag)) : courses;
+
   return (
-    <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>app/page.tsx</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
-
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore starter templates for Next.js.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
+    <main className={`${main.main}`}>
+      <Sidebar courses={courses} onTagSelect={handleTagSelect} />
+      <CoursesList courses={filteredCourses} />
     </main>
   );
 }
+
+export default memo(Home);

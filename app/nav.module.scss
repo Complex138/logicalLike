@@ -1,0 +1,40 @@
+.sidebar {
+    width: 264px;
+    position: fixed;
+    padding: 12px;
+    border-radius: 18px;
+    border: 1px solid #000;
+
+    ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+
+        li {
+            margin: 0;
+            padding: 0;
+            display: inline-flex;
+
+            a.link {
+                text-decoration: none;
+                color: #000;
+                font-family: 'Nunito', Arial, sans-serif;
+                width: 240px;
+                height: 42px;
+                padding: 12px;
+                border-radius: 12px;
+                font-size: 18px;
+                font-weight: 800;
+                line-height: 18px;
+                display: flex;
+                align-items: center;
+                justify-content: flex-start;
+            }
+
+            a.linkActive {
+                background-color: rgba(95, 191, 119, 1);
+                color: white;
+            }
+        }
+    }
+}
